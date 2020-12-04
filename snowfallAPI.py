@@ -1,67 +1,79 @@
+#Olivia
+
 import os
 import requests
 import http.client
 import json
 import sqlite3
+import pandas as pd
+from datetime import datetime
 
-
-# Create the Cache and Path
-path = os.path.dirname(os.path.realpath(__file__))
-snow_cache = path + '/' + "season_snowfall.json"
+# Define the Key
 key = "195dc45ef9c74ffcb81195700200212"
 
-#Read the Cache
-def read_cache(CACHE_FNAME):
-    try:
-        fhand = open(CACHE_FNAME, 'r')
-        cache_dict = json.loads(fhand.read())
-        fhand.close()
-        return cache_dict
-    except:
-        cache_dict = {}
-        return cache_dict
+#Create the Database, URL, and Get the Data
+def get_data():
+    #Build API url..and insert into request, make a for loop to go through dates,append all to a list
+    path = os.path.dirname(os.path.realpath(__file__))
+    conn = sqlite3.connnnect(path + '/' + "finaldatabase.db")
+    cur = conn.cursor
 
-#Write into the Cache
-def write_cache(CACHE_FNAME, cache_dict):
-    fpath = os.path.join(os.path.dirname(__file__), CACHE_FNAME)
-    fhand = open(fpath, 'w')
-    fhand.write(json.dumps(cache_dict))
+    start = datetime.datetime.strptime("15-12-2018", "%d-%m-%Y")
+    end = datetime.datetime.strptime("24-03-2014", "%d-%m-%Y")
+    date_generated = [start + datetime.timedelta(days=x) for x in range(0, (end-start).days)]
+    dates = []
+    for date in date_generated:
+        dates.append(date.strftime("%d-%m-%Y"))
 
-#Create the URL
-def get_url(area_id):
-    curl = f"http://api.weatherapi.com/v1/history.json?key=195dc45ef9c74ffcb81195700200212&q=81657&dt=2019-02-15"
-    return curl
+    condition_lst = []
+    for num in range (0, 101):
+        for date in dates:
+            url = f"http://api.weatherapi.com/v1/history.json?key=195dc45ef9c74ffcb81195700200212&q=81657&dt=" + str(date) 
+            request = requests.get(url)
+            data = json.loads(request.text)
 
-#Get the Data
-def get_data(curl, CACHE_FNAME):
-    cache_dict = read_cache(CACHE_FNAME)
-    if curl in cache_dict:
-        return cache_dict[curl]
-    else:
-        request = requests.get(curl)
-        cache_dict[curl] = json.loads(request.text)
-        write_cache(CACHE_FNAME, cache_dict)
-        return cache_dict[curl]
-
-
-#Create the Database
-path = os.path.dirname(os.path.abspath(__file__))
-conn = sqlite3.connect(path + '/' + "finaldatabase.db")
-cur = conn.cursor()
+            conditions = data['forecast']['forecastday'][0]['day']['condition']['text']
+            condition_lst.append(conditions)
+    results = list(zip(dates, conditions))
+    return results
 
 #Create the Chance of Snowfall
-def SnowfallTable():
-    chance_lst = []
-    for info in data['forecast']['forecastday']
-        
-    cur.execute("DROP TABLE IF EXISTS ChanceofSnowfall")
-    cur.execute("CREATE TABLE IF NOT EXISTS SnowfallInVail (date TEXT PRIMARY KEY, chance_of_snow TEXT")
-    for info in data['forecast']:
-        cur.execute("INSERT INTO ChanceofSnow (Date, Chance of Snow) VALUES (?, ?)", ChanceofSnowfall.date, ChanceofSnowfall.chance_of_snow ")
+def ConditionTable(cur,conn):
+    info = get_data()
+    counter = 0
+    cur.execute("CREATE TABLE IF NOT EXISTS ConditionInVail (Date TEXT PRIMARY KEY, Condition TEXT")
+    for item in range(len(info)):
+        if counter < 24:
+            break
+        if cur.execute("SELECT") == None:
+            date = info[item][0]
+            condition = info[item][1]
+            cur.execute("INSERT INTO ConditioninVail (Date, Condition) VALUES (?, ?)", (date, condition))
+            counter += 1
+    conn.commit()
 
 #Create the Precipitation 
+def PrecipitationTable(cur, conn):
+    precip_lst = []
+    for info in data['forecast']['forecastday'][0]['day']['totalprecip_in']:
+        precip_lst.append(info)
+    cur.execute("DROP TABLE IF IT EXISTS PrecipitationinVail")
+    cur.execute("CREATE TABLE IF NOT EXISTS PrecipitationinVail (Date TEXT PRIMARY KEY, TotalPrecipitation TEXT")
+    for item in range(len(dates)):
+        cur.execute("INSERT INTO PrecipitationinVail (Date, TotalPrecipitation) VALUES (?,?)", (dates[item], precip_lst[item]))
+    conn.commit()
 
+def main():
+    #Creating Filename
+    path = os.path.dirname(os.path.realpath(__file__))
+    key = "195dc45ef9c74ffcb81195700200212"
 
-
+    #Initiliazing dates
+    start = datetime.datetime.strptime("15-12-2018", "%d-%m-%Y")
+    end = datetime.datetime.strptime("24-03-2014", "%d-%m-%Y")
+    date_generated = [start + datetime.timedelta(days=x) for x in range(0, (end-start).days)]
+    dates = []
+    for date in date_generated:
+        dates.append(date.strftime("%d-%m-%Y"))
 
 

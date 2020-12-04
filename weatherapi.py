@@ -32,7 +32,7 @@ def get_temp_and_day():
 def create_database(cur, conn):
     data = get_temp_and_day()
     count = 0
-    cur.execute("CREATE TABLE Weather (Date TEXT PRIMARY KEY, Temperature INTEGER)")
+    cur.execute("CREATE TABLE Weather (Date TEXT PRIMARY KEY, Temperature INTEGER,)")
     for tup in range(len(data)):
         if count < 24:
             break

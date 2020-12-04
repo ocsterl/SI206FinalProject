@@ -23,5 +23,6 @@ conn = sqlite3.connect(path + '/' + "finalprojectdatabase.db")
 cur = conn.cursor()
 
 
+#DataFrame date/price
 s = getHistoricalPrices('MTN', start, end)
-print(s)
+price = s.drop(columns = ['volume'])

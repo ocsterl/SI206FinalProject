@@ -11,7 +11,7 @@ import time
 
 
 def getHistoricalPrices(stock, start, end):
-    return get_historical_data(stock, start, end, close_only = True, token="pk_cbc5a6be61024a4b9c55afd49271d1cb")
+    return get_historical_data(stock, start, end, close_only = True, token="pk_0b97f59343db4ac18746910e73a44945")
 
 #Date Range
 start = datetime(2018, 12, 15)
@@ -23,4 +23,4 @@ conn = sqlite3.connect(path + '/' + "finalprojectdatabase.db")
 cur = conn.cursor()
 
 
-print(getHistoricalPrices('MTN', start, end))
+s = getHistoricalPrices('MTN', start, end)

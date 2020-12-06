@@ -57,25 +57,3 @@ def main():
 if __name__ == "__main__":
     main()
 
-
-         
-    # for i in range(len(category_list)):
-    #     cur.execute("INSERT INTO Weather (date,temp) VALUES (?,?)",(i,category_list[i]))
-    # conn.commit()
-#     #create db file and cur and con -- modify name of file from assignments 
-#     #DONT DO DROP TABLE 
-#     #date PRIMARY KEY -- across ALL DATABASE (makes joins easier)
-#     cur.execute("CREATE TABLE ")
-#     temps = get_temp_and_day() 
-#     count = 0
-#     for x in temps:
-#         #check count var 
-#         if count < 24:
-#             break
-#         #select statement 
-#         if cur.execute("SELECT ") == None:
-#             cur.execute("INSERT date, temp = ? ?",
-#             count += 1
-
-#     con.commit()
-

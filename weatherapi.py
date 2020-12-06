@@ -29,8 +29,6 @@ def get_temp_and_day():
         r = response["data"]["weather"][0]["avgtempF"]
         temps.append(r)
         combined  = list(zip(dates, temps))
-    print(combined)
-
     return combined  
 
 def create_table(cur, conn):

@@ -26,7 +26,7 @@ def SetUpDatabase():
 
 #DataFrame date/price
 s = getHistoricalPrices('MTN', start, end)
-price = s.drop(columns = ['volume'])
+
 
 #List of Prices
 prices = s['close'].to_list()

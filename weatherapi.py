@@ -9,7 +9,7 @@ import sqlite3
 
 def get_temp_and_day():
     path = os.path.dirname(os.path.abspath(__file__))
-    conn = sqlite3.connect(path+'/'+ "finaldatabase.db")
+    conn = sqlite3.connect(path+'/'+ "finalprojectdatabase.db")
     cur = conn.cursor()
     
     d = datetime.date(2018, 11, 30)

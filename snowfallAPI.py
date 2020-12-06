@@ -6,7 +6,7 @@ import http.client
 import json
 import sqlite3
 import pandas as pd
-from datetime import datetime
+import datetime
 
 # Define the Key
 key = "195dc45ef9c74ffcb81195700200212"
@@ -15,27 +15,29 @@ key = "195dc45ef9c74ffcb81195700200212"
 def get_data():
     #Build API url..and insert into request, make a for loop to go through dates,append all to a list
     path = os.path.dirname(os.path.realpath(__file__))
-    conn = sqlite3.connnnect(path + '/' + "finaldatabase.db")
+    conn = sqlite3.connect(path + '/' + "finaldatabase.db")
     cur = conn.cursor
 
-    start = datetime.datetime.strptime("15-12-2018", "%d-%m-%Y")
-    end = datetime.datetime.strptime("24-03-2014", "%d-%m-%Y")
-    date_generated = [start + datetime.timedelta(days=x) for x in range(0, (end-start).days)]
-    dates = []
-    for date in date_generated:
-        dates.append(date.strftime("%d-%m-%Y"))
-
     condition_lst = []
-    for num in range (0, 101):
-        for date in dates:
-            url = f"http://api.weatherapi.com/v1/history.json?key=195dc45ef9c74ffcb81195700200212&q=81657&dt=" + str(date) 
-            request = requests.get(url)
-            data = json.loads(request.text)
+    precip_lst = []
 
-            conditions = data['forecast']['forecastday'][0]['day']['condition']['text']
-            condition_lst.append(conditions)
-    results = list(zip(dates, conditions))
-    return results
+    date = datetime.date(2018, 11, 30)
+    d = str(date)
+    dates = []
+    for item in range(0, 101):
+        d = date + datetime.timedelta(days = item)
+        url = f"http://api.weatherapi.com/v1/history.json?key=195dc45ef9c74ffcb81195700200212&q=81657&dt=" + str(d) 
+        dates.append(str(d))
+        request = requests.get(url)
+        data = json.loads(request.text)
+        conditions = data['forecast']['forecastday'][0]['day']['condition']['text']
+        condition_lst.append(conditions)
+        precip = data['forecast']['forecastday'][0]['day']['totalprecip_in']
+        precip_lst.append(precip)
+    c_results = list(zip(dates, condition_lst))
+    p_results = list(zip(dates, precip_lst))
+    return c_results, p_results, conn, cur
+
 
 #Create the Chance of Snowfall
 def ConditionTable(cur,conn):
@@ -43,7 +45,7 @@ def ConditionTable(cur,conn):
     counter = 0
     cur.execute("CREATE TABLE IF NOT EXISTS ConditionInVail (Date TEXT PRIMARY KEY, Condition TEXT")
     for item in range(len(info)):
-        if counter < 24:
+        if counter > 24:
             break
         if cur.execute("SELECT") == None:
             date = info[item][0]
@@ -54,26 +56,28 @@ def ConditionTable(cur,conn):
 
 #Create the Precipitation 
 def PrecipitationTable(cur, conn):
-    precip_lst = []
-    for info in data['forecast']['forecastday'][0]['day']['totalprecip_in']:
-        precip_lst.append(info)
-    cur.execute("DROP TABLE IF IT EXISTS PrecipitationinVail")
-    cur.execute("CREATE TABLE IF NOT EXISTS PrecipitationinVail (Date TEXT PRIMARY KEY, TotalPrecipitation TEXT")
-    for item in range(len(dates)):
-        cur.execute("INSERT INTO PrecipitationinVail (Date, TotalPrecipitation) VALUES (?,?)", (dates[item], precip_lst[item]))
+    info = get_data()
+    counter = 0
+    cur.execute("CREATE TABLE IF NOT EXISTS PrecipitationinVail (Date TEXT PRIMARY KEY, Precipitation INTEGER")
+    for item in range(len(info)):
+        if counter > 24:
+            break
+        if cur.execute("SELECT") == None:
+            date = info[item][0]
+            precip = info[item][1]
+            cur.execute("INSERT INTO ConditioninVail (Date, Precipiation) VALUES (?, ?)", (date, precip))
+            counter += 1
     conn.commit()
+
+
 
 def main():
     #Creating Filename
     path = os.path.dirname(os.path.realpath(__file__))
     key = "195dc45ef9c74ffcb81195700200212"
 
-    #Initiliazing dates
-    start = datetime.datetime.strptime("15-12-2018", "%d-%m-%Y")
-    end = datetime.datetime.strptime("24-03-2014", "%d-%m-%Y")
-    date_generated = [start + datetime.timedelta(days=x) for x in range(0, (end-start).days)]
-    dates = []
-    for date in date_generated:
-        dates.append(date.strftime("%d-%m-%Y"))
+    lists = get_data()
 
+if __name__ == "__main__":
+    main()
 

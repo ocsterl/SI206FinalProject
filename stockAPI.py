@@ -78,7 +78,7 @@ def create_volume_table(cur, conn):
             break
         day = data[tup][0]
         volume = data[tup][1]
-        cur.execute("INSERT INTO Price (Date, Volume) VALUES (?, ?)", (day, volume,))
+        cur.execute("INSERT INTO Volume (Date, Volume) VALUES (?, ?)", (day, volume,))
         count += 1
     conn.commit()
 

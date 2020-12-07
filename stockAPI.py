@@ -52,7 +52,6 @@ lst2 = list(zip(dates, volume))
 
 #Create Price Table
 def create_price_table(cur, conn):
-
     data = lst1
     count = 0
     cur.execute("DROP TABLE IF EXISTS Price")
@@ -84,7 +83,8 @@ def create_volume_table(cur, conn):
 
 
 def main():
-
+    lst1
+    lst2
     cur, conn = SetUpDatabase()
     create_price_table(cur, conn)
     create_volume_table(cur, conn)

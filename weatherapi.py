@@ -39,36 +39,148 @@ def get_temp_and_day():
 def create_table(cur, conn):
 
     data = get_temp_and_day()
-    count = 0
     temp = []
-    days = []
+    dates = []
     total = 0
     average = 0
-    cur.execute("DROP TABLE IF EXISTS Weather")
-    cur.execute("CREATE TABLE Weather (Date TEXT PRIMARY KEY, Temperature INTEGER, HoursOfSun INTEGER)")
-    for tup in range(len(data)):
-        if count > 24:
-            break
-        day = data[tup][0]
-        days.append(day)
-        temperature = data[tup][1]
-        temp.append(temperature)
-        hours = data[tup][2]
-        cur.execute("INSERT INTO Weather (Date, Temperature, HoursOfSun) VALUES (?, ?, ?)", (day, temperature,hours,))
-        count += 1
+    cur.execute("CREATE TABLE IF NOT EXISTS Weather (DateID INTEGER PRIMARY KEY, Date TEXT, Temperature INTEGER, HoursOfSun INTEGER)")
+    
+    # for tup in range(len(data)):
+    #     if count > 24:
+    #         break
+    #     day = data[tup][0]
+    #     temperature = data[tup][1]
+    #     hours = data[tup][2]
+    #     cur.execute("INSERT INTO Weather (Date, Temperature, HoursOfSun) VALUES (?, ?, ?)", (day, temperature,hours,))
+    #     count += 1
+    cur.execute("SELECT Date FROM Weather")
+    datelist = cur.fetchall()
+    count = len(datelist)
+    for x in range(25):
+        DateID = count + 1
+        day = data[count][0]
+        temperature = data[count][1]
+        hours = data[count][2]
+        count = count + 1
+        cur.execute("INSERT OR IGNORE INTO Weather (DateID, Date, Temperature, HoursOfSun) VALUES (?, ?, ?, ?)", (DateID, day, temperature,hours,))
+
     conn.commit()
 
-    cur.execute("DROP TABLE IF EXISTS Averages")
-    cur.execute("CREATE TABLE Averages (Days TEXT PRIMARY KEY, AverageTemp INTEGER)")
-    for t in temp:
-        total = total + int(t)
-    average = total / len(temp)
+    cur.execute("CREATE TABLE IF NOT EXISTS Averages (Months TEXT PRIMARY KEY, AverageTemp FLOAT)")
+    months = []
+    tempD = []
+    tempJ = []
+    tempF = []
+    tempM = []
+    tempA = []
+    tempMay = []
+    avgj = 0
+    avgd = 0
+    avgf = 0
+    avgm = 0
+    avgmay = 0
+    avga = 0
+    averages = []
+    countD  = 0
+    countJ = 0
+    countF = 0
+    countM = 0
+    countA = 0
+    countMay = 0
 
-    dayrange = days[0] + " to " + days[-1]
+    for x in range(len(data)):
+        day = data[x][0]
+        dates.append(day)
+        temperature = data[x][1]
+        temp.append(temperature)
+    daytemp = list(zip(dates, temp))
+    print(daytemp)
+    for d in range(len(daytemp)):
+        if daytemp[d][0][5:7] == "12":
+            if countD < 1:
+                months.append("December")
+                countD += 1
+            tempD.append(daytemp[d][1][-2:])
 
-    print(dayrange)
+        if daytemp[d][0][5:7] == "01":
+            if countJ  < 1:
+                months.append("January")
+                countJ += 1
+            tempJ.append(daytemp[d][1][-2:])
 
-    cur.execute("INSERT INTO Averages (Days, AverageTemp) VALUES (?, ?)", (dayrange, average,))
+
+        if daytemp[d][0][5:7] == "02":
+            if countF < 1:
+                months.append("Feburary")
+                countF +=  1
+            tempF.append(daytemp[d][1][-2:])
+
+    
+        if daytemp[d][0][5:7] == "03":
+            if  countM < 1:
+                months.append("March")
+                countM += 1
+            tempM.append(daytemp[d][1][-2:])
+        
+            
+        if daytemp[d][0][5:7] == "04":
+            if countA < 1:
+                months.append("April")
+                countA += 1
+            tempA.append(daytemp[d][1][-2:])
+
+            
+        if daytemp[d][0][5:7] == "05":
+            if countMay < 1:
+                months.append("May")
+                countMay += 1
+            tempMay.append(daytemp[d][1][-2:])
+
+    if len(tempD) > 1:
+        for x in tempD:
+            avgd += int(x)
+        avd = float(avgd/len(tempD))
+        averages.append(avd)
+
+    if len(tempJ) > 1:
+        for x in tempJ:
+            avgj += int(x)
+        avj = float(avgj/len(tempJ))
+        averages.append(avj)
+
+    if len(tempF) > 1:
+        for x in tempF:
+            avgf += int(x)
+        avf = float(avgf/len(tempF))
+        averages.append(avf) 
+
+    if len(tempM)  > 1:
+        for x in tempM:
+            avgm += int(x)
+        avm = float(avgm/len(tempM))
+        averages.append(avm)
+
+    if len(tempA) > 1:
+
+        for x in tempA:
+            avga += int(x)
+        ava = float(avga/len(tempA))
+        averages.append(ava)
+
+    if len(tempMay) > 1:
+
+        for x in tempMay:
+            avgmay += int(x)
+        avmay = float(avgmay/len(tempMay))
+        averages.append(avmay)
+   
+   
+    print(months)
+    print(averages)
+
+    for i in range(0, len(months)):       
+        cur.execute("INSERT INTO Averages (Months, AverageTemp) VALUES (?, ?)", (months[i], averages[i],))
+    
     conn.commit()
 
         
@@ -77,9 +189,11 @@ def create_table(cur, conn):
 
     
 
-# def jointables(cur, conn):
-#     cur.execute("SELECT Weather.Date, Weather.Temperature FROM Weather JOIN ConditioninVail WHERE Weather.Date = ConditioninVail.Date, PercipitationinVail.Date")
-#     conn.commit()
+def jointables(cur, conn):
+    pass
+    #  cur.execute("SELECT Weather.Date, Weather.Temperature FROM Weather JOIN Price WHERE Weather.Date = Price.Date")
+    #  cur.execute("SELECT Weather.Date, Weather.Temperature FROM Weather JOIN Volume WHERE Weather.Date = Volume.Date")
+    #  conn.commit()
 
 def main():
     combo = get_temp_and_day()
@@ -91,3 +205,6 @@ def main():
 
 if __name__ == "__main__":
     main()
+
+
+

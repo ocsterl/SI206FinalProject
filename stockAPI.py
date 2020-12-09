@@ -22,6 +22,7 @@ def SetUpDatabase():
     path = os.path.dirname(os.path.abspath(__file__))
     conn = sqlite3.connect(path + '/' + "finaldatabase.db")
     cur = conn.cursor()
+    return cur, conn
 
 
 #DataFrame date/price
@@ -46,3 +47,51 @@ for i in range(0, len(a_list)):
 
 lst1 = list(zip(dates, prices))
 lst2 = list(zip(dates, volume))
+
+
+
+#Create Price Table
+def create_price_table(cur, conn):
+    data = lst1
+    count = 0
+    cur.execute("DROP TABLE IF EXISTS Price")
+    cur.execute("CREATE TABLE Price (Date TEXT PRIMARY KEY, Price INTEGER)")
+    for tup in range(len(data)):
+        if count > 24:
+            break
+        day = data[tup][0]
+        price = data[tup][1]
+        cur.execute("INSERT INTO Price (Date, Price) VALUES (?, ?)", (day, price,))
+        count += 1
+    conn.commit()
+
+
+#Create Volume Table
+def create_volume_table(cur, conn):
+    data = lst2
+    count = 0
+    cur.execute("DROP TABLE IF EXISTS Volume")
+    cur.execute("CREATE TABLE Volume (Date TEXT PRIMARY KEY, Volume INTEGER)")
+    for tup in range(len(data)):
+        if count > 24:
+            break
+        day = data[tup][0]
+        volume = data[tup][1]
+        cur.execute("INSERT INTO Volume (Date, Volume) VALUES (?, ?)", (day, volume,))
+        count += 1
+    conn.commit()
+
+
+def main():
+    lst1
+    lst2
+    cur, conn = SetUpDatabase()
+    create_price_table(cur, conn)
+    create_volume_table(cur, conn)
+
+
+
+
+
+if __name__ == "__main__":
+    main()

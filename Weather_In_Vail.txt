@@ -1,1 +1,5 @@
-
+The average weather in December was 12.548387096774194
+The average weather in January was 
+The average weather in Feburary was 
+The average weather in March was 
+The average weather in April was 

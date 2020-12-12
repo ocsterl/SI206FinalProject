@@ -10,12 +10,15 @@ import datetime
 key = "195dc45ef9c74ffcb81195700200212"
 
 #Create the Database, URL, and Get the Data
-def get_data():
+def SetUp():
     #Build API url..and insert into request, make a for loop to go through dates,append all to a list
     path = os.path.dirname(os.path.realpath(__file__))
     conn = sqlite3.connect(path + '/' + "finaldatabase.db")
     cur = conn.cursor()
+    return cur, conn
 
+
+def get_data():
     condition_lst = []
     precip_lst = []
 
@@ -35,12 +38,12 @@ def get_data():
     c_results = list(zip(dates, condition_lst))
     p_results = list(zip(dates, precip_lst))
     print(c_results)
-    return c_results, p_results, conn, cur
+    return c_results, p_results
 
 
 #Create the Chance of Snowfall
-def ConditionTable():
-    c_results, p_results, conn, cur = get_data()
+def ConditionTable(conn, cur):
+    c_results, p_results = get_data()
     cur.execute("CREATE TABLE IF NOT EXISTS ConditionInVail (dateid INTEGER PRIMARY KEY, date TEXT, condition TEXT)")
     cur.execute("SELECT Date FROM ConditionInVail")
     datelst = cur.fetchall()
@@ -55,8 +58,8 @@ def ConditionTable():
     conn.commit()
 
 # Create the Precipitation 
-def PrecipitationTable():
-    c_results, p_results, conn, cur = get_data()
+def PrecipitationTable(conn, cur):
+    c_results, p_results = get_data()
     counter = 0
     cur.execute("CREATE TABLE IF NOT EXISTS PrecipitationInVail (dateid TEXT PRIMARY KEY, date TEXT, precipitation INTEGER)")
     cur.execute("SELECT date From PrecipitationInVail")
@@ -70,8 +73,8 @@ def PrecipitationTable():
         cur.execute("INSERT OR IGNORE INTO PrecipitationInVail (dateid, date, precipitation) VALUES (?, ?, ?)", (dateid, date, precipitation))
     conn.commit()
 
-def Get_Most_Common_Condition():
-    c_results, p_results, conn, cur = get_data()
+def Get_Most_Common_Condition(conn, cur):
+    c_results, p_results = get_data()
     for num in range(0,5):
         if num == 1:
             clear_lst1 = []
@@ -152,14 +155,22 @@ def Get_Most_Common_Condition():
         filer.write("There were " + str(clear_len3) + " clear days, " + str(c_len3) + " cloudy days, " + str(r_len3) + " rainy days, " + str(s_len3) + " snowy days in Vail during the month of February." + "\n") 
         filer.write("There were " + str(clear_len4) +  " clear days, " + str(c_len4) + " cloudy days, " + str(r_len4) + " rainy days, " + str(s_len4) + " snowy days in Vail during the month of March. " + "\n") 
 
+def jointables(precipitation, cur, conn):
+    cur.execute("SELECT PrecipitationInVail.Date FROM PrecipitationInVail JOIN Weather WHERE PrecipitationInVail.Date = Weather.Date AND Weather.Temperature = ?", (precipitation,))
+    return cur.fetchall()
+
+
 def main():
     #Creating Filename
     path = os.path.dirname(os.path.realpath(__file__))
     key = "195dc45ef9c74ffcb81195700200212"
     # meep = Get_Most_Common_Condition()
+    cur, conn = SetUp()
     lists = get_data()
-    # c_table = ConditionTable()
-    # p_table = PrecipitationTable()
+    c_table= ConditionTable(conn,cur)
+    p_table = PrecipitationTable(conn, cur)
+    joins = jointables(PrecipitationInVail(), conn, cur)
+
 
 if __name__ == "__main__":
     main()

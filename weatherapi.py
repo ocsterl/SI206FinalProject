@@ -5,6 +5,7 @@ import json
 import datetime
 import os
 import sqlite3
+import matplotlib.pyplot as plt
 
 
 def SetUpDatabase():
@@ -94,7 +95,6 @@ def create_table(cur, conn):
         temperature = data[x][1]
         temp.append(temperature)
     daytemp = list(zip(dates, temp))
-    print(daytemp)
     for d in range(len(daytemp)):
         if daytemp[d][0][5:7] == "12":
             if countD < 1:
@@ -175,30 +175,159 @@ def create_table(cur, conn):
         averages.append(avmay)
    
    
-    print(months)
-    print(averages)
 
     for i in range(0, len(months)):       
-        cur.execute("INSERT INTO Averages (Months, AverageTemp) VALUES (?, ?)", (months[i], averages[i],))
-    
+        cur.execute("INSERT OR IGNORE INTO Averages (Months, AverageTemp) VALUES (?, ?)", (months[i], averages[i],))
     conn.commit()
 
-        
-        
+def createvisual(cur, conn):
+    data = get_temp_and_day()
+    temp = []
+    dates = []
+    data = get_temp_and_day()
+    temp = []
+    dates = []
+    total = 0
+    average = 0
 
+    datelist = cur.fetchall()
+    count = len(datelist)
+    for x in range(25):
+        DateID = count + 1
+        day = data[count][0]
+        temperature = data[count][1]
+        hours = data[count][2]
+        count = count + 1
+
+    months = []
+    tempD = []
+    tempJ = []
+    tempF = []
+    tempM = []
+    tempA = []
+    tempMay = []
+    avgj = 0
+    avgd = 0
+    avgf = 0
+    avgm = 0
+    avgmay = 0
+    avga = 0
+    averages = []
+    countD  = 0
+    countJ = 0
+    countF = 0
+    countM = 0
+    countA = 0
+    countMay = 0
+
+    for x in range(len(data)):
+        day = data[x][0]
+        dates.append(day)
+        temperature = data[x][1]
+        temp.append(temperature)
+    daytemp = list(zip(dates, temp))
+    for d in range(len(daytemp)):
+        if daytemp[d][0][5:7] == "12":
+            if countD < 1:
+                months.append("December")
+                countD += 1
+            tempD.append(daytemp[d][1][-2:])
+
+        if daytemp[d][0][5:7] == "01":
+            if countJ  < 1:
+                months.append("January")
+                countJ += 1
+            tempJ.append(daytemp[d][1][-2:])
+
+
+        if daytemp[d][0][5:7] == "02":
+            if countF < 1:
+                months.append("Feburary")
+                countF +=  1
+            tempF.append(daytemp[d][1][-2:])
 
     
+        if daytemp[d][0][5:7] == "03":
+            if  countM < 1:
+                months.append("March")
+                countM += 1
+            tempM.append(daytemp[d][1][-2:])
+        
+            
+        if daytemp[d][0][5:7] == "04":
+            if countA < 1:
+                months.append("April")
+                countA += 1
+            tempA.append(daytemp[d][1][-2:])
 
-def jointables(cur, conn):
-    pass
-    #  cur.execute("SELECT Weather.Date, Weather.Temperature FROM Weather JOIN Price WHERE Weather.Date = Price.Date")
-    #  cur.execute("SELECT Weather.Date, Weather.Temperature FROM Weather JOIN Volume WHERE Weather.Date = Volume.Date")
-    #  conn.commit()
+            
+        if daytemp[d][0][5:7] == "05":
+            if countMay < 1:
+                months.append("May")
+                countMay += 1
+            tempMay.append(daytemp[d][1][-2:])
+
+    if len(tempD) > 1:
+        for x in tempD:
+            avgd += int(x)
+        avd = float(avgd/len(tempD))
+        averages.append(avd)
+
+    if len(tempJ) > 1:
+        for x in tempJ:
+            avgj += int(x)
+        avj = float(avgj/len(tempJ))
+        averages.append(avj)
+
+    if len(tempF) > 1:
+        for x in tempF:
+            avgf += int(x)
+        avf = float(avgf/len(tempF))
+        averages.append(avf) 
+
+    if len(tempM)  > 1:
+        for x in tempM:
+            avgm += int(x)
+        avm = float(avgm/len(tempM))
+        averages.append(avm)
+
+    if len(tempA) > 1:
+
+        for x in tempA:
+            avga += int(x)
+        ava = float(avga/len(tempA))
+        averages.append(ava)
+
+    if len(tempMay) > 1:
+
+        for x in tempMay:
+            avgmay += int(x)
+        avmay = float(avgmay/len(tempMay))
+        averages.append(avmay)
+   
+   
+    mon = []
+    for m in months:
+        mon.append(m[0:3])
+    
+
+    fig, ax = plt.subplots()
+    ax.plot(mon, averages)
+    ax.set_xlabel("Months")
+    ax.set_ylabel("Temperature (F)")
+    ax.set_title("Average Temperature Per Month")
+
+    fig.savefig("Average-Temperature.png")
+    plt.show()
+
+
+
 
 def main():
     combo = get_temp_and_day()
     cur, conn = SetUpDatabase()
     create_table(cur, conn)
+    createvisual(cur, conn)
 
 
 

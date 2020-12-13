@@ -1,10 +1,10 @@
 #Olivia
-
+import json
 import requests
 import os
-import json
 import sqlite3
 import datetime
+import plotly.graph_objects as go
 
 # Define the Key
 key = "195dc45ef9c74ffcb81195700200212"
@@ -73,7 +73,7 @@ def PrecipitationTable(conn, cur):
         cur.execute("INSERT OR IGNORE INTO PrecipitationInVail (dateid, date, precipitation) VALUES (?, ?, ?)", (dateid, date, precipitation))
     conn.commit()
 
-def Get_Most_Common_Condition(conn, cur):
+def Get_Most_Common_Condition():
     c_results, p_results = get_data()
     for num in range(0,5):
         if num == 1:
@@ -99,7 +99,7 @@ def Get_Most_Common_Condition(conn, cur):
             cloudy_lst2 = []
             rain_lst2 = []
             snow_lst2 = []
-            for item in c_results[31:63]:
+            for item in c_results[32:63]:
                 if item[1] == "Sunny" or item[1] == "Clear":
                     clear_lst2.append(item)
                 elif item[1] == "Partly cloudy" or item[1] == "Overcast" or item[1] == "Fog" or item[1] == "Freezing fog":
@@ -148,6 +148,7 @@ def Get_Most_Common_Condition(conn, cur):
                 c_len4 = len(cloudy_lst4)
                 r_len4 = len(rain_lst4)
                 s_len4 = len(snow_lst4)
+    
     with open("Conditions_Per_Month.txt", "w") as filer:
         filer.write("Conditions in Vail Per Month" + "\n")
         filer.write("There were " + str(clear_len1) + " clear days, " + str(c_len1) + " cloudy days, " + str(r_len1) + " rainy days, " + str(s_len1) + " snowy days in Vail during the month of December." + "\n") 
@@ -155,21 +156,40 @@ def Get_Most_Common_Condition(conn, cur):
         filer.write("There were " + str(clear_len3) + " clear days, " + str(c_len3) + " cloudy days, " + str(r_len3) + " rainy days, " + str(s_len3) + " snowy days in Vail during the month of February." + "\n") 
         filer.write("There were " + str(clear_len4) +  " clear days, " + str(c_len4) + " cloudy days, " + str(r_len4) + " rainy days, " + str(s_len4) + " snowy days in Vail during the month of March. " + "\n") 
 
-def jointables(precipitation, cur, conn):
-    cur.execute("SELECT PrecipitationInVail.Date FROM PrecipitationInVail JOIN Weather WHERE PrecipitationInVail.Date = Weather.Date AND Weather.Temperature = ?", (precipitation,))
+#Creating Plot for Conditions Per Month:'
+def ConditionsGraph():
+    months = ["December", "January", "February", "March"]
+    title_lbl = "Conditions in Vail Per Month"
+    fig = go.Figure(data = [
+        go.Bar(name = "Clear Days", x = months, y = [18, 0, 0, 0]),
+        go.Bar(name = "Cloudy Days", x = months, y = [9, 11, 8 ,6]),
+        go.Bar(name = "Rainy Days", x = months, y = [0, 0, 0, 1]),
+        go.Bar(name = "Snowy Days", x = months, y = [3, 21, 21, 24]),
+    ])
+    fig.update_layout(
+        title = {'text': title_lbl},
+        font_family = "Sans Serif",
+        barmode='group')
+    fig.show()
+
+def jointables(cur, conn):
+    cur.execute("SELECT PrecipitationInVail.date, PrecipitationInVail.precipitation FROM PrecipitationInVail JOIN Weather WHERE PrecipitationInVail.date = Weather.Date")
     return cur.fetchall()
 
 
+
 def main():
-    #Creating Filename
+    # #Creating Filename
     path = os.path.dirname(os.path.realpath(__file__))
     key = "195dc45ef9c74ffcb81195700200212"
-    # meep = Get_Most_Common_Condition()
+    # commons = Get_Most_Common_Condition()
     cur, conn = SetUp()
-    lists = get_data()
-    c_table= ConditionTable(conn,cur)
-    p_table = PrecipitationTable(conn, cur)
-    joins = jointables(PrecipitationInVail(), conn, cur)
+    # lists = get_data()
+    # c_table= ConditionTable(conn,cur)
+    # p_table = PrecipitationTable(conn, cur)
+    joins = jointables(cur, conn)
+    print(joins)
+    # # graph1 = ConditionsGraph()
 
 
 if __name__ == "__main__":

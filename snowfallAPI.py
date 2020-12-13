@@ -5,6 +5,8 @@ import os
 import sqlite3
 import datetime
 import plotly.graph_objects as go
+import plotly.express as px
+import pandas as pd
 
 # Define the Key
 key = "195dc45ef9c74ffcb81195700200212"
@@ -171,6 +173,14 @@ def ConditionsGraph():
         font_family = "Sans Serif",
         barmode='group')
     fig.show()
+    dates = ['2018-12-01', '2018-12-02', '2018-12-03', '2018-12-04', '2018-12-05', '2018-12-06', '2018-12-07', '2018-12-08', '2018-12-09', '2018-12-10', '2018-12-11', '2018-12-12', '2018-12-13', '2018-12-14', '2018-12-15', '2018-12-16', '2018-12-17', '2018-12-18', '2018-12-19', '2018-12-20', '2018-12-21', '2018-12-22', '2018-12-23', '2018-12-24', '2018-12-25', '2018-12-26', '2018-12-27', '2018-12-28', '2018-12-29', '2018-12-30', '2018-12-31']
+    precip_lvls = [0.05, 0.02, 0.04, 0.01, 0.02, 0.02, 0, 0, 0, 0, 0, 0.09, 0.02, 0, 0, 0, 0, 0, 0.15, 0, 0.01, 0.04, 0, 0.22, 0, 0.07, 0.01, 0.05, 0, 0.02, 0.22]
+    
+    df = pd.DataFrame(dict(precipitation=precip_lvls, date= dates, month="December"*len(dates)))
+
+    img = px.scatter(df, x = "date", y="precipitation", title="Precipitation Levels in Vail in December")
+    img.show()
+
 
 def jointables(cur, conn):
     cur.execute("SELECT PrecipitationInVail.date, PrecipitationInVail.precipitation FROM PrecipitationInVail JOIN Weather WHERE PrecipitationInVail.date = Weather.Date")
@@ -187,9 +197,9 @@ def main():
     # lists = get_data()
     # c_table= ConditionTable(conn,cur)
     # p_table = PrecipitationTable(conn, cur)
-    joins = jointables(cur, conn)
-    print(joins)
-    # # graph1 = ConditionsGraph()
+    # joins = jointables(cur, conn)
+    # print(joins)
+    graph1 = ConditionsGraph()
 
 
 if __name__ == "__main__":

@@ -194,11 +194,11 @@ def main():
     key = "195dc45ef9c74ffcb81195700200212"
     # commons = Get_Most_Common_Condition()
     cur, conn = SetUp()
-    # lists = get_data()
-    # c_table= ConditionTable(conn,cur)
-    # p_table = PrecipitationTable(conn, cur)
-    # joins = jointables(cur, conn)
-    # print(joins)
+    lists = get_data()
+    c_table= ConditionTable(conn,cur)
+    p_table = PrecipitationTable(conn, cur)
+    joins = jointables(cur, conn)
+    print(joins)
     graph1 = ConditionsGraph()
 
 

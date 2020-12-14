@@ -1,5 +1,0 @@
-Average Temperature Per Month
-Average Temperature in December was 12.548387096774194. 
-Average Temperature in January was 23.419354838709676. 
-Average Temperature in Feburary was 22.071428571428573. 
-Average Temperature in March was 29.35483870967742. 

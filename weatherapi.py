@@ -179,6 +179,21 @@ def create_table(cur, conn):
     for i in range(0, len(months)):       
         cur.execute("INSERT OR IGNORE INTO Averages (Months, AverageTemp) VALUES (?, ?)", (months[i], averages[i],))
     conn.commit()
+    newm = []
+    for x in months:
+        newm.append(str(x))
+    newa = []
+    for x in averages:
+        newa.append(str(x))
+
+
+    with open('Average_Temp_Per_Month.txt', 'w') as f:
+        f.write("Average Temperature Per Month" + '\n')
+        f.write("Average Temperature in " + str(months[0]) + " was " + str(averages[0])+ ". \n")
+        f.write("Average Temperature in " + str(months[1]) + " was " + str(averages[1])+ ". \n")
+        f.write("Average Temperature in " + str(months[2]) + " was " + str(averages[2]) +". \n")
+        f.write("Average Temperature in " + str(months[3]) + " was " + str(averages[3]) +". \n")
+
 
 def createvisual(cur, conn):
     data = get_temp_and_day()

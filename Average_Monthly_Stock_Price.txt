@@ -1,0 +1,5 @@
+Monthly Average Price of MTN For December, January, February, and March
+The average price of MTN in December was $214.314.
+The average price of MTN in January was $195.49809523809523.
+The average price of MTN in February was $204.77421052631576.
+The average price of MTN in March was $212.64857142857142.

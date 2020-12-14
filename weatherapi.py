@@ -100,7 +100,7 @@ def create_table(cur, conn):
             if countD < 1:
                 months.append("December")
                 countD += 1
-            tempD.append(daytemp[d][1][-2:])
+            tempD.append(int(daytemp[d][1][-2:]))
 
         if daytemp[d][0][5:7] == "01":
             if countJ  < 1:
@@ -199,9 +199,6 @@ def createvisual(cur, conn):
     data = get_temp_and_day()
     temp = []
     dates = []
-    data = get_temp_and_day()
-    temp = []
-    dates = []
     total = 0
     average = 0
 
@@ -234,6 +231,7 @@ def createvisual(cur, conn):
     countM = 0
     countA = 0
     countMay = 0
+    i = []
 
     for x in range(len(data)):
         day = data[x][0]
@@ -243,6 +241,7 @@ def createvisual(cur, conn):
     daytemp = list(zip(dates, temp))
     for d in range(len(daytemp)):
         if daytemp[d][0][5:7] == "12":
+            i.append(daytemp[d][0][8:])
             if countD < 1:
                 months.append("December")
                 countD += 1
@@ -324,6 +323,14 @@ def createvisual(cur, conn):
     mon = []
     for m in months:
         mon.append(m[0:3])
+
+    newtemps = []
+    for temp in tempD:
+        newtemps.append(int(temp))
+    
+    print(i)
+    print(newtemps)
+
     
 
     fig, ax = plt.subplots()
@@ -335,6 +342,14 @@ def createvisual(cur, conn):
     fig.savefig("Average-Temperature.png")
     plt.show()
 
+    figure, axi = plt.subplots()
+    axi.plot(i, newtemps)
+    axi.set_xlabel("December Dates")
+    axi.set_ylabel("Temperature (F)")
+    axi.set_title("Temperature in December")
+
+    figure.savefig("December-Temp.png")
+    plt.show()
 
 
 
